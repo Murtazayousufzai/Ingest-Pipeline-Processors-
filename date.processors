@@ -1,0 +1,157 @@
+Patterns for Formatting and Parsing
+Patterns are based on a simple sequence of letters and symbols. A pattern is used to create a Formatter using the ofPattern(String) and ofPattern(String, Locale) methods. For example, "d MMM uuuu" will format 2011-12-03 as '3 Dec 2011'. A formatter created from a pattern can be used as many times as necessary, it is immutable and is thread-safe.
+
+For example:
+
+      LocalDate date = LocalDate.now();
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy MM dd");
+      String text = date.format(formatter);
+      LocalDate parsedDate = LocalDate.parse(text, formatter);
+     
+
+All letters 'A' to 'Z' and 'a' to 'z' are reserved as pattern letters. The following pattern letters are defined:
+
+  Symbol  Meaning                     Presentation      Examples
+  ------  -------                     ------------      -------
+   G       era                         text              AD; Anno Domini; A
+   u       year                        year              2004; 04
+   y       year-of-era                 year              2004; 04
+   D       day-of-year                 number            189
+   M/L     month-of-year               number/text       7; 07; Jul; July; J
+   d       day-of-month                number            10
+
+   Q/q     quarter-of-year             number/text       3; 03; Q3; 3rd quarter
+   Y       week-based-year             year              1996; 96
+   w       week-of-week-based-year     number            27
+   W       week-of-month               number            4
+   E       day-of-week                 text              Tue; Tuesday; T
+   e/c     localized day-of-week       number/text       2; 02; Tue; Tuesday; T
+   F       week-of-month               number            3
+
+   a       am-pm-of-day                text              PM
+   h       clock-hour-of-am-pm (1-12)  number            12
+   K       hour-of-am-pm (0-11)        number            0
+   k       clock-hour-of-am-pm (1-24)  number            0
+
+   H       hour-of-day (0-23)          number            0
+   m       minute-of-hour              number            30
+   s       second-of-minute            number            55
+   S       fraction-of-second          fraction          978
+   A       milli-of-day                number            1234
+   n       nano-of-second              number            987654321
+   N       nano-of-day                 number            1234000000
+
+   V       time-zone ID                zone-id           America/Los_Angeles; Z; -08:30
+   z       time-zone name              zone-name         Pacific Standard Time; PST
+   O       localized zone-offset       offset-O          GMT+8; GMT+08:00; UTC-08:00;
+   X       zone-offset 'Z' for zero    offset-X          Z; -08; -0830; -08:30; -083015; -08:30:15;
+   x       zone-offset                 offset-x          +0000; -08; -0830; -08:30; -083015; -08:30:15;
+   Z       zone-offset                 offset-Z          +0000; -0800; -08:00;
+
+   p       pad next                    pad modifier      1
+
+   '       escape for text             delimiter
+   ''      single quote                literal           '
+   [       optional section start
+   ]       optional section end
+   #       reserved for future use
+   {       reserved for future use
+   }       reserved for future use
+ 
+
+The count of pattern letters determines the format. 
+
+////////this processor parse every formaat ////
+POST _ingest/pipeline/_simulate
+{"pipeline": {
+  "processors": [
+    {
+      "date": {
+        "field": "date_field",
+        "target_field": "@timestamp",
+        "formats": [
+          "ISO8601",
+  "yyyy-MM-dd'T'HH:mm:ss.SSS",
+  "yyyy-MM-dd'T'HH:mm:ss",
+  "yyyy-MM-dd'T'HH:mm",
+  "yyyy-MM-dd'T'HH",
+  "yyyy'W'wwe'T'HHmmssZ",
+  "yyyy'W'wwe'T'HHmmss.SSSZ",
+  "yyyy'W'wwe",
+  "'T'HHmmssZ",
+  "'T'HHmmss.SSSZ",
+  "HHmmssZ",
+  "HHmmss.SSSZ",
+  "yyyyDDD'T'HHmmssZ",
+  "yyyyDDD'T'HHmmss.SSSZ",
+  "yyyyDDD",
+  "yyyyMMdd'T'HHmmssZ",
+  "yyyyMMdd'T'HHmmss.SSSZ",
+  "yyyyMMdd",
+  "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ",
+  "yyyy-MM-dd",                        
+  "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSXXX",
+  "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+  "yyyy-MM-dd'T'HH:mm:ssXXX",
+  "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+  "yyyy-MM-dd'T'HH:mm:ssZ",
+  "yyyy-MM-dd HH:mm:ss",
+  "dd/MM/yyyy HH:mm:ss",
+  "dd/MM/yyyy",
+  "MM/dd/yyyy HH:mm:ss",
+  "MM/dd/yyyy",
+  "dd-MM-yyyy",
+  "dd.MM.yyyy",
+  "MMM dd, yyyy HH:mm:ss",
+  "MMM dd, yyyy",
+  "dd MMM yyyy HH:mm",
+  "dd MMMM yyyy",
+  "yyyy/MM/dd",
+  "yyyyMMdd",
+  "dd MMM yyyy",
+  "MMMM dd, yyyy",
+  "EEE, dd MMM yyyy HH:mm:ss z",
+  "EEE MMM dd HH:mm:ss zzz yyyy",      
+  "UNIX",                             
+  "UNIX_MS",                          
+  "8#yyyyMMdd",                       
+  "8#yyyy-MM-dd"
+],
+        "ignore_failure": true
+      }
+    }
+  ]
+  },
+  "docs": [
+    {
+      "_source": {
+        "date_field": "11/21/2025 16:27"
+      }
+    },
+    {
+      "_source": {
+        "date_field": "2025-11-21T16:27:00+05:00"
+      }
+    },
+    {
+      "_source": {
+        "date_field": "21 Nov 2025 04:27 PM"
+      }
+    },
+    {
+      "_source": {
+        "date_field": "1732201620"
+      }
+    },
+    {"_source": {"date_field": "2025-11-21T16:48:00.123"}},
+    {"_source": {"date_field": "2025-11-21T16:48:00"}},
+    {"_source": {"date_field": "2025-11-21T16:48"}},
+    {"_source": {"date_field": "2025-11-21T16"}},
+    {"_source": {"date_field": "2025W471T164800Z"}},
+    {"_source": {"date_field": "20251121T164800.123Z"}},
+    {"_source": {"date_field": "20251121"}},
+    {"_source": {"date_field": "T164800Z"}},
+    {"_source": {"date_field": "2025325T164800Z"}},
+    {"_source": {"date_field": "2025-11-21"}}
+  ]
+}
