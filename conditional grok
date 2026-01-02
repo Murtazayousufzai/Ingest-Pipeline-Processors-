@@ -1,0 +1,29 @@
+POST /_ingest/pipeline/_simulate
+{
+  "pipeline": {
+    "description": "_description",
+    "processors": [
+      {
+        "grok": {
+          "ignore_failure": false,
+          "field": "message",
+          "patterns": [
+            "%{LOGLEVEL:log.level}%{SPACE}\\[%{TIMESTAMP_ISO8601:@timestamp}\\]%{SPACE}(service-a:%{SPACE}%{GREEDYDATA:service.a}|service-b:%{SPACE}%{GREEDYDATA:service.b})"
+          ]
+        }
+      }
+    ]
+  },
+  "docs": [
+    {
+      "_source": {
+        "message": "ERROR [2025-12-03 09:15:42] service-a: Failed to connect to 10.0.0.5: Timeout"
+      }
+    },
+    {
+      "_source": {
+        "message": "WARN [2025-12-03 09:15:42] service-b: Disk usage at 85%"
+      }
+    }
+  ]
+}
